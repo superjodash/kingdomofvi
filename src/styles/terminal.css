@@ -1,0 +1,38 @@
+.terminal {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.terminal-text {
+  font-family: 'Courier New', Courier, monospace;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+}
+
+.buffer-line {
+  white-space: pre;
+  min-height: 1.4em;
+}
+
+.cursor-block {
+  background-color: #e0e0e0;
+  color: #1a1a2e;
+}
+
+.cursor-line {
+  border-left: 2px solid #e0e0e0;
+}
+
+.visual-highlight {
+  background-color: rgba(100, 100, 255, 0.3);
+}
+
+.parchment {
+  background-color: #f5e6c8;
+  color: #3a2a1a;
+  border: 3px double #8b7355;
+  font-family: 'Courier New', Courier, monospace;
+}
