@@ -11,7 +11,7 @@ interface ShellProps {
 
 export function Shell({ children }: ShellProps) {
   return (
-    <div className="terminal min-h-screen flex flex-col bg-black text-green-400 font-mono">
+    <div className="terminal h-screen flex flex-col overflow-hidden bg-black text-green-400 font-mono">
       {children}
     </div>
   );

@@ -1,5 +1,4 @@
 import { useKeyCapture } from '../hooks/useKeyCapture.ts';
-import { useTypewriter } from '../hooks/useTypewriter.ts';
 import { ScrollModal } from '../components/ScrollModal.tsx';
 import type { LessonDef } from '../game/lessons/types.ts';
 
@@ -10,33 +9,25 @@ interface LocationScrollScreenProps {
 }
 
 export function LocationScrollScreen({ lesson, onContinue, onBack }: LocationScrollScreenProps) {
-  const { text: vignetteText, done: vignetteDone } = useTypewriter(lesson.scroll.vignette, 300, 10, 60);
-  const { text: storyText, done: storyDone } = useTypewriter(
-    vignetteDone ? lesson.scroll.storyBeat : '',
-    200, 5, 30,
-  );
-
   useKeyCapture((key) => {
-    if (key === 'Enter' && storyDone) onContinue();
+    if (key === 'Enter') onContinue();
     if (key === 'Esc') onBack();
   });
 
   return (
     <ScrollModal onContinue={onContinue} onBack={onBack}>
-      <pre className="text-center whitespace-pre-wrap mb-4 text-amber-800 font-bold">
-        {vignetteText}
+      <pre className="whitespace-pre mb-4 text-amber-800 font-bold">
+        {lesson.scroll.vignette}
       </pre>
-      {vignetteDone && (
-        <>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{storyText}</p>
-          {storyDone && (
-            <div className="mt-4 pt-3 border-t border-amber-300">
-              <p className="text-xs font-bold text-amber-700">New Power:</p>
-              <p className="text-sm text-amber-900 font-mono">{lesson.scroll.newPowerDescription}</p>
-            </div>
-          )}
-        </>
-      )}
+      <p className="text-sm leading-relaxed whitespace-pre-wrap">{lesson.story}</p>
+      <div className="mt-4 pt-3 border-t border-amber-300">
+        <p className="text-xs font-bold text-amber-700 mb-1">New Keys:</p>
+        <p className="text-sm text-amber-900 whitespace-pre-wrap leading-relaxed">{lesson.teach}</p>
+      </div>
+      <div className="mt-3 pt-2 border-t border-amber-300">
+        <p className="text-xs font-bold text-amber-700">Summary:</p>
+        <p className="text-sm text-amber-900 font-mono">{lesson.scroll.newPowerDescription}</p>
+      </div>
     </ScrollModal>
   );
 }

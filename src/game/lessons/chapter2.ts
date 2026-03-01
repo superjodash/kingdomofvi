@@ -10,6 +10,8 @@ export const chapter2Lessons: LessonDef[] = [
     mapLabel: 'BRIARPATH',
     unlocks: ['w', 'b', 'e'],
     prerequisite: 4,
+    story: 'A hedgerow maze blocks the road. The briars snag your cloak when you step one letter at a time. A gardener shows you a trick: leap by words — the path becomes easy.',
+    teach: 'w: move to the start of the next word\nb: move to the start of the previous word\ne: move to the end of the current/next word\n\nFast navigation and pairing with operators (dw, ce).',
     scroll: {
       vignette: `  ~~~~~~~
 ==\\___/==    Briarpath Crossing
@@ -55,10 +57,12 @@ the creek giggles at your boots
     mapLabel: 'OLD OAK',
     unlocks: ['W', 'B', 'E'],
     prerequisite: 5,
+    story: 'In the Old Oak Library, scrolls are full of punctuation and sticky tokens like tea_time@dawn. An owl librarian whispers: "Sometimes a word is too small. Travel by WORD."',
+    teach: 'W: move to start of next WORD (whitespace-separated token)\nB: move to start of previous WORD\nE: move to end of current/next WORD\n\nGreat for code-like strings and symbol-heavy text.',
     scroll: {
       vignette: `  (:::)
   /___\\     Old Oak Library`,
-      storyBeat: 'Some texts are full of symbols and punctuation—sticky like sap.\nBig WORD motions leap over them cleanly.',
+      storyBeat: 'Some texts are full of symbols and punctuation — sticky like sap.\nBig WORD motions leap over them cleanly.',
       newPowerDescription: 'W (next WORD) B (back WORD) E (end of WORD)',
     },
     arena: {
@@ -68,70 +72,68 @@ the creek giggles at your boots
 #   previous + W B E
 #
 # QUEST:
-#   - Use W/B/E at least 3 times each.
-#   - Navigate through the library catalog below.
+#   - Use W/B/E at least 5 times each.
+#   - Stand on each rune token: <RUNE_1> <RUNE_2> <RUNE_3>
 
-Catalog Entry #1:  book.title="A-Journey-Through-Vim"
-Catalog Entry #2:  shelf[3].row{7}  => (fiction/fantasy)
-Catalog Entry #3:  author.name="The-Friendly-Scribe"
-Catalog Entry #4:  isbn:978-3-16-148410-0 / price=$12.50
-Catalog Entry #5:  tags=[cozy,adventure,keyboard]`,
+Scroll of Sticky Symbols:
+<RUNE_1>  potion+milk=warm  quest_item:map  hello-world!
+<RUNE_2>  (cozy) [cottage] {lantern} <bridge>
+<RUNE_3>  dragons? no_thanks.  tea_time@dawn  yay!!!`,
       arrowsAllowed: false,
     },
     gems: {
       gem1: (ctx) =>
-        (ctx.keyCounts['W'] ?? 0) >= 3 &&
-        (ctx.keyCounts['B'] ?? 0) >= 3 &&
-        (ctx.keyCounts['E'] ?? 0) >= 3,
+        (ctx.keyCounts['W'] ?? 0) >= 5 &&
+        (ctx.keyCounts['B'] ?? 0) >= 5 &&
+        (ctx.keyCounts['E'] ?? 0) >= 5,
       gem2: visitedPositions(15),
       gem3: totalKeystrokesUnder(30),
     },
-    award: { text: 'The oak creaks with approval. Big leaps suit you well.' },
+    award: { text: 'The owl stamps your passport: "APPROVED: BIG WORD TRAVELER."' },
   },
   {
     id: 7,
     chapter: 2,
-    title: 'Counting Tower',
-    subtitle: 'The Power of Numbers',
-    mapLabel: 'COUNTING',
+    title: 'Milestone Shrine',
+    subtitle: 'The Power of Counts',
+    mapLabel: 'MILESTONE',
     unlocks: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
     prerequisite: 6,
+    story: 'A shrine of carved numbers hums beside the road. Each numeral glows warmly, like a candle in stone. A monk says, "A count is a promise. Speak it once, and your feet obey."',
+    teach: 'Counts: prefix many motions/commands with a number to repeat them.\n  5j = move down 5 lines\n  3w = jump forward 3 words\n  9l = move right 9 characters\n\nHuge speed gains and fewer keystrokes.',
     scroll: {
-      vignette: `   [7]
-   [5]       Counting Tower
-   [3]       numbers multiply your power
-   [1]`,
-      storyBeat: 'Every motion can be multiplied.\nType a number before any key to repeat it.',
+      vignette: `    /\\
+   /  \\    Milestone Shrine
+  /____\\   numbers carved in stone`,
+      storyBeat: 'Numbers are not math here — they\'re momentum.\nWhy walk five steps when you can declare five steps?',
       newPowerDescription: '1-9 (count prefix) e.g., 3w = three words forward',
     },
     arena: {
-      initialBuffer: `# COUNTING TOWER
+      initialBuffer: `# MILESTONE SHRINE
 #
 # Allowed Keys:
-#   previous + 1-9 (count prefix)
+#   all previous + counts
 #
 # QUEST:
-#   - Use counts with motions (e.g., 3j, 5l, 2w).
-#   - Reach the treasure [T] at the bottom-right.
+#   - Perform each at least once: 5j, 7k, 9l, 3w, 2b
+#   - Reach the altar [ALTAR] and stand on it.
 
-Start here -->
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-.........................................................
-...................................................[T]`,
+Path of Carved Numbers:
+(1)  pebble pebble pebble pebble pebble
+(2)  pebble pebble pebble pebble pebble
+(3)  pebble pebble pebble pebble pebble
+(4)  pebble pebble pebble pebble pebble
+(5)  pebble pebble pebble pebble pebble
+(6)  pebble pebble pebble pebble pebble
+(7)  pebble pebble pebble pebble pebble
+(8)  pebble pebble pebble pebble pebble
+(9)  pebble pebble pebble pebble pebble
+(10) [ALTAR] a small bowl of gems glows softly`,
       arrowsAllowed: false,
     },
     gems: {
       gem1: (ctx) => ctx.totalKeystrokes > 0,
       gem2: (ctx) => {
-        // Check that at least one digit was used
         for (let d = 1; d <= 9; d++) {
           if ((ctx.keyCounts[String(d)] ?? 0) >= 1) return true;
         }
@@ -139,6 +141,6 @@ Start here -->
       },
       gem3: totalKeystrokesUnder(15),
     },
-    award: { text: 'The tower bell rings once for every clever shortcut you found.' },
+    award: { text: 'A gem chimes in the bowl. Numbers, it turns out, can be cozy.' },
   },
 ];

@@ -20,6 +20,10 @@ export function parseExCommand(input: string): ExCommandResult {
     case 'x':
       return { type: 'save-quit' };
 
+    case 'q':
+    case 'quit':
+      return { type: 'quit' };
+
     case 'q!':
       return { type: 'force-quit' };
 

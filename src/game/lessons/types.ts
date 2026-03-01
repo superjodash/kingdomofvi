@@ -18,6 +18,8 @@ export interface LessonDef {
   mapLabel: string;
   unlocks: string[];
   prerequisite: number | null;
+  story: string;
+  teach: string;
   scroll: {
     vignette: string;
     storyBeat: string;

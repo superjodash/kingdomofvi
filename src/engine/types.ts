@@ -47,6 +47,7 @@ export type TextObjectName =
 export type ExCommandResult =
   | { type: 'save' }
   | { type: 'reload' }
+  | { type: 'quit' }
   | { type: 'save-quit' }
   | { type: 'force-quit' }
   | { type: 'split'; direction: 'horizontal' | 'vertical' }

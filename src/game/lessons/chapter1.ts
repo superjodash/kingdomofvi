@@ -10,6 +10,8 @@ export const chapter1Lessons: LessonDef[] = [
     mapLabel: 'TRAILHEAD',
     unlocks: ['Enter'],
     prerequisite: null,
+    story: 'You wake on a dew-bright page of grass. A wooden signpost stands ahead, its ink still wet. The Kingdom itself seems to be writing around you. Before royal techniques, you must learn how to move at all.',
+    teach: 'Arrow keys (training wheels): move the cursor one cell in the direction pressed.\nEnter: confirm/continue/interact.',
     scroll: {
       vignette: `   _/\\_
   /    \\     Trailhead Meadow
@@ -23,8 +25,8 @@ export const chapter1Lessons: LessonDef[] = [
 # The grass is soft. The air smells like parchment.
 #
 # QUEST:
-#   1) Use the arrow keys to move the cursor to the ! signpost.
-#   2) Press Enter when you reach it.
+#   1) Use the arrow keys to move the @ to the ! signpost.
+#   2) Press Enter.
 #
 # (Arrows are training wheels. You'll soon learn the home-row way.)
 
@@ -48,6 +50,8 @@ export const chapter1Lessons: LessonDef[] = [
     mapLabel: 'HOME ROW',
     unlocks: ['h', 'j', 'k', 'l'],
     prerequisite: 1,
+    story: 'The path leads to a sleepy village where cats lounge on sunlit keys. An innkeeper explains that royal scribes never hunt for arrows — their hands stay home, always ready.',
+    teach: 'h: move cursor left one character\nj: move cursor down one line\nk: move cursor up one line\nl: move cursor right one character\n\nThese are the core Normal-mode motions used everywhere.',
     scroll: {
       vignette: `   /\\_/\\      Village of Home Row
   ( o.o )     the cats guard the keys
@@ -98,10 +102,12 @@ export const chapter1Lessons: LessonDef[] = [
     mapLabel: 'STONEBRIDGE',
     unlocks: ['0', '^', '$'],
     prerequisite: 2,
+    story: 'Beyond the village is a stone bridge made of long, narrow slabs — each slab is a line. A bridge-warden insists: "If you can\'t reach the start and end of a line, you\'ll trip forever."',
+    teach: '0: jump to the start of the line\n^: jump to the first non-blank character on the line\n$: jump to the end of the line\n\nFast line editing and pairing with operators later (d$, c^).',
     scroll: {
       vignette: `===[====]===     Stonebridge of Lines
    |  |          where lines begin and end`,
-      storyBeat: 'Sometimes you must cross a line swiftly—no tiny steps.\nLearn the stones: to the start, to the first rune, to the end.',
+      storyBeat: 'Sometimes you must cross a line swiftly — no tiny steps.\nLearn the stones: to the start, to the first rune, to the end.',
       newPowerDescription: '0 (line start) ^ (first char) $ (line end)',
     },
     arena: {
@@ -111,19 +117,22 @@ export const chapter1Lessons: LessonDef[] = [
 #   h j k l   0 ^ $
 #
 # QUEST:
-#   - On each line below, land on the diamond using 0, ^, and $.
+#   - On each line below, land on the * using 0, ^, and $.
 #   - Use each of 0 ^ $ at least 5 times.
+#
+# Tip: 0 goes to column 0. ^ goes to the first non-blank character.
+#      Lines with leading spaces show the difference!
 
-Line A:            *---(end)
-Line B:      *
-Line C:                  *
-Line D:   *
-Line E:                 *
-Line F:        *
-Line G:              *
+     Line A:            *---(end)
+          Line B:      *
+  Line C:                  *
+       Line D:   *
+            Line E:                 *
+   Line F:        *
+         Line G:              *
 Line H: *
-Line I:            *
-Line J:                 *`,
+      Line I:            *
+           Line J:                 *`,
       arrowsAllowed: false,
     },
     gems: {
@@ -144,6 +153,8 @@ Line J:                 *`,
     mapLabel: 'CLIFFSIDE',
     unlocks: ['g', 'G'],
     prerequisite: 3,
+    story: 'The road becomes a cliff path with a lookout at the top and a shell-strewn shore far below. A wind-sage laughs: "Some journeys are too long for walking. Learn the page-jumps."',
+    teach: 'gg: jump to the top of the file (first line)\nG: jump to the bottom of the file (last line)\n\nInstant travel in big files; later you\'ll use counts like 10G.',
     scroll: {
       vignette: `   /\\            Cliffside Steps
   /  \\           the sky is a page
@@ -205,7 +216,7 @@ Line J:                 *`,
       arrowsAllowed: false,
     },
     gems: {
-      gem1: usedKey('g', 6), // gg used 3 times = 6 'g' presses
+      gem1: usedKey('g', 6),
       gem2: usedKey('G', 3),
       gem3: totalKeystrokesUnder(20),
     },

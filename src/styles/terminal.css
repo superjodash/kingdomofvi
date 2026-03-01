@@ -30,6 +30,14 @@
   background-color: rgba(100, 100, 255, 0.3);
 }
 
+/* Hide scrollbar on the buffer viewport — vi doesn't have scrollbars */
+.buffer-viewport {
+  scrollbar-width: none; /* Firefox */
+}
+.buffer-viewport::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge */
+}
+
 .parchment {
   background-color: #f5e6c8;
   color: #3a2a1a;

@@ -12,15 +12,21 @@ interface BufferRendererProps {
   selection: Selection | null;
 }
 
+const VISIBLE_ROWS = 30;
+
 export function BufferRenderer({ lines, cursor, mode, selection }: BufferRendererProps) {
   const selRange = selection ? normalizeSelection(selection, mode) : null;
+  const tildeRows = Math.max(0, VISIBLE_ROWS - lines.length);
 
   return (
-    <div className="flex-1 overflow-hidden font-mono text-sm leading-5">
+    <div className="font-mono text-sm leading-5 w-[80ch]">
       {lines.map((line, lineIdx) => (
         <div key={lineIdx} className="buffer-line whitespace-pre h-5">
           {renderLine(line, lineIdx, cursor, mode, selRange)}
         </div>
+      ))}
+      {Array.from({ length: tildeRows }, (_, i) => (
+        <div key={`tilde-${i}`} className="buffer-line whitespace-pre h-5 text-blue-500">~</div>
       ))}
     </div>
   );

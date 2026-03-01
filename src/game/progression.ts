@@ -15,6 +15,7 @@ export function getAllowedKeys(
   }
   keys.add('Esc');
   keys.add('Enter');
+  keys.add(':');  // Always allow : so players can :q to exit
   return keys;
 }
 
