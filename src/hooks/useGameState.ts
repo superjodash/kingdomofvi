@@ -23,6 +23,14 @@ function saveState(state: GameState) {
   }
 }
 
+function clearSavedState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Silently fail if localStorage is unavailable
+  }
+}
+
 function createNewGame(playerName: string): GameState {
   const progress = initializeProgress(TOTAL_LESSONS);
   return {
@@ -56,6 +64,8 @@ export function useGameState() {
   }, []);
 
   const goToNameEntry = useCallback(() => {
+    clearSavedState();
+    setGameState(null);
     setPreGameScreen('name-entry');
   }, []);
 

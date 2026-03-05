@@ -73,6 +73,7 @@ function App() {
           onMove={(locationId) => {
             setLocation(locationId);
           }}
+          onHome={() => navigateTo({ type: 'title' })}
         />
       )}
 

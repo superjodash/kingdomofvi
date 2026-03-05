@@ -12,6 +12,7 @@ interface MapScreenProps {
   playerName: string;
   onSelectLocation: (lessonId: number) => void;
   onMove: (locationId: number) => void;
+  onHome: () => void;
 }
 
 interface MapCell {
@@ -37,6 +38,7 @@ export function MapScreen({
   playerName,
   onSelectLocation,
   onMove,
+  onHome,
 }: MapScreenProps) {
   const [playerPos, setPlayerPos] = useState<Pos>(() => {
     const node = getNodeById(currentLocation);
@@ -75,6 +77,9 @@ export function MapScreen({
       case 'j': case 'ArrowDown':  dr = 1;  break;
       case 'h': case 'ArrowLeft':  dc = -1; break;
       case 'l': case 'ArrowRight': dc = 1;  break;
+      case 'Esc':
+        onHome();
+        return;
       case 'Enter': {
         if (nodeHere && canEnter(nodeHere.id, currentLocation, lessonProgress)) {
           onSelectLocation(nodeHere.id);
@@ -114,8 +119,8 @@ export function MapScreen({
           </span>
           <span className="text-gray-500">
             {nodeHere
-              ? '[hjkl] Move  [Enter] Enter location'
-              : '[hjkl] Move'}
+              ? '[hjkl] Move  [Enter] Enter location  [Esc] Home'
+              : '[hjkl] Move  [Esc] Home'}
           </span>
         </div>
       </div>
