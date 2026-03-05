@@ -1,6 +1,6 @@
 import './styles/terminal.css';
 import { Shell } from './components/Shell.tsx';
-import { TitleScreen } from './screens/TitleScreen.tsx';
+import TitleScreen from './screens/TitleScreen.tsx';
 import { NameEntryScreen } from './screens/NameEntryScreen.tsx';
 import { MapScreen } from './screens/MapScreen.tsx';
 import { LocationScrollScreen } from './screens/LocationScrollScreen.tsx';

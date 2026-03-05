@@ -44,3 +44,16 @@
   border: 3px double #8b7355;
   font-family: 'Courier New', Courier, monospace;
 }
+
+.scroll-text {
+  font-family: 'URW Chancery L', 'Apple Chancery', 'Snell Roundhand', 'Palatino Linotype', 'Book Antiqua', cursive;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.scroll-input {
+  font-family: 'Palatino Linotype', 'Book Antiqua', Garamond, Georgia, serif;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}

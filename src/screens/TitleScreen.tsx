@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import titleImage from '../assets/title.png';
 import { useKeyCapture } from '../hooks/useKeyCapture.ts';
 
 interface TitleScreenProps {
@@ -40,21 +41,11 @@ export function TitleScreen({ hasSavedGame, onNewGame, onContinue }: TitleScreen
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center">
-      <pre className="terminal-text text-green-400 text-center mb-8">
-{`
-          .     *    .        .
-     *        |>>>        .
-    .        /___\\     *     .
-        .   |[] []|    .
-     *      |_____|  .     *
-            |     |
-          __|_____|__
-         /           \\
-        / Kingdom of  \\
-       /      VI       \\
-      /________________ \\
-`}
-      </pre>
+      <img
+        src={titleImage}
+        alt="Kingdom of VI"
+        className="mb-8 w-full max-w-2xl h-auto"
+      />
       <div className="space-y-2">
         {items.map((item, i) => (
           <div
@@ -85,3 +76,5 @@ export function TitleScreen({ hasSavedGame, onNewGame, onContinue }: TitleScreen
     </div>
   );
 }
+
+export default TitleScreen;
