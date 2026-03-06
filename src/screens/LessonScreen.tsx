@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState, useRef } from 'react';
 import { useEditor } from '../hooks/useEditor.ts';
 import { useKeyCapture } from '../hooks/useKeyCapture.ts';
 import { BufferRenderer } from '../components/BufferRenderer.tsx';
@@ -38,10 +38,8 @@ export function LessonScreen({ lesson, allowedKeys, onComplete, onQuit }: Lesson
   }, [hasTarget, isComplete, lesson, keystrokeState, lines, onComplete]);
 
   // For lessons WITHOUT a targetBuffer, track when all quest objectives are met
-  const [questReady, setQuestReady] = useState(false);
-
-  useEffect(() => {
-    if (hasTarget || completedRef.current) return;
+  const questReady = useMemo(() => {
+    if (hasTarget) return false;
 
     const targetLines = lesson.arena.targetBuffer
       ? lesson.arena.targetBuffer.split('\n')
@@ -49,13 +47,9 @@ export function LessonScreen({ lesson, allowedKeys, onComplete, onQuit }: Lesson
     const ctx = buildGemContext(keystrokeState, lines, targetLines);
 
     try {
-      const obj1 = lesson.gems.gem1(ctx);
-      const obj2 = lesson.gems.gem2(ctx);
-      if (obj1 && obj2) {
-        setQuestReady(true);
-      }
+      return lesson.gems.gem1(ctx) && lesson.gems.gem2(ctx);
     } catch {
-      // gem check failed
+      return false;
     }
   }, [hasTarget, keystrokeState, lines, lesson]);
 
@@ -73,6 +67,16 @@ export function LessonScreen({ lesson, allowedKeys, onComplete, onQuit }: Lesson
     // F1 opens the lesson scroll for reference
     if (key === 'F1') {
       setShowScroll(true);
+      return;
+    }
+
+    // While the quest-complete modal is showing, only Enter should finish the lesson.
+    if (!hasTarget && questReady) {
+      if (key === 'Enter') {
+        completedRef.current = true;
+        const gems = evaluateGems(lesson, keystrokeState, lines);
+        onComplete(gems);
+      }
       return;
     }
 
@@ -96,13 +100,6 @@ export function LessonScreen({ lesson, allowedKeys, onComplete, onQuit }: Lesson
       return;
     }
 
-    // For no-target lessons, Enter on the quest-complete overlay finishes
-    if (!hasTarget && questReady && key === 'Enter') {
-      completedRef.current = true;
-      const gems = evaluateGems(lesson, keystrokeState, lines);
-      onComplete(gems);
-      return;
-    }
   }, [onComplete, onQuit, processKey, hasTarget, questReady, lesson, keystrokeState, lines, showEscHint, showScroll, state.mode]);
 
   useKeyCapture(handleKey);
@@ -127,29 +124,37 @@ export function LessonScreen({ lesson, allowedKeys, onComplete, onQuit }: Lesson
   const buf = state.buffers[state.activeBufferIndex];
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 relative">
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto buffer-viewport">
-        <BufferRenderer
-          lines={lines}
-          cursor={state.cursor}
+    <div className="flex-1 flex flex-col min-h-0 relative px-4 py-3">
+      <div className="w-[80ch] max-w-full mx-auto mb-2 text-center">
+        <div className="text-amber-300 text-sm">{lesson.title}</div>
+        <div className="text-gray-500 text-xs">{lesson.subtitle}</div>
+      </div>
+
+      <div className="w-[80ch] max-w-full mx-auto flex-1 min-h-0 border border-gray-700 bg-black/40 flex flex-col">
+        <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto buffer-viewport">
+          <BufferRenderer
+            lines={lines}
+            cursor={state.cursor}
+            mode={state.mode}
+            selection={state.selection}
+          />
+        </div>
+        <CommandLine
+          text={state.commandLineText}
+          searchBuffer={searchBuffer}
+        />
+        <StatusLine
           mode={state.mode}
-          selection={state.selection}
+          cursor={state.cursor}
+          fileName={lesson.title}
+          modified={buf.modified}
+          message={state.message}
         />
       </div>
-      <CommandLine
-        text={state.commandLineText}
-        searchBuffer={searchBuffer}
-      />
-      <StatusLine
-        mode={state.mode}
-        cursor={state.cursor}
-        fileName=""
-        modified={buf.modified}
-        message={state.message}
-      />
-      {showEscHint && <EscHintModal />}
+
+      {showEscHint && !questReady && <EscHintModal />}
       {showScroll && <LessonScrollOverlay lesson={lesson} />}
-      {questReady && !hasTarget && !completedRef.current && <QuestCompleteOverlay />}
+      {questReady && !hasTarget && <QuestCompleteOverlay />}
     </div>
   );
 }

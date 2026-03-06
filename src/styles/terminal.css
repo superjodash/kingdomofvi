@@ -30,12 +30,41 @@
   background-color: rgba(100, 100, 255, 0.3);
 }
 
-/* Hide scrollbar on the buffer viewport — vi doesn't have scrollbars */
+/* Lessons can keep using this class if needed. */
 .buffer-viewport {
   scrollbar-width: none; /* Firefox */
 }
 .buffer-viewport::-webkit-scrollbar {
   display: none; /* Chrome/Safari/Edge */
+}
+
+.themed-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #b45309 rgba(0, 0, 0, 0.35);
+}
+
+.themed-scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.themed-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(120, 113, 108, 0.45);
+}
+
+.themed-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f59e0b, #b45309);
+  border: 2px solid rgba(0, 0, 0, 0.45);
+  border-radius: 9999px;
+}
+
+.themed-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #fbbf24, #d97706);
+}
+
+.themed-scrollbar::-webkit-scrollbar-corner {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .parchment {

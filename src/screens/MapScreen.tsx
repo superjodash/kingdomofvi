@@ -1,6 +1,6 @@
 import { useState, useMemo, useLayoutEffect, useRef, type ReactNode, type JSX } from 'react';
 import { useKeyCapture } from '../hooks/useKeyCapture.ts';
-import { MAP_NODES, MAP_EDGES, getNodeById, CHAPTER_NAMES } from '../game/mapData.ts';
+import { MAP_NODES, MAP_EDGES, MAP_ROWS, MAP_COLS, getNodeById, CHAPTER_NAMES } from '../game/mapData.ts';
 import { isLessonAccessible } from '../game/progression.ts';
 import type { MapNode } from '../game/mapData.ts';
 import type { LessonProgress } from '../game/types.ts';
@@ -25,8 +25,8 @@ interface Pos {
   col: number;
 }
 
-const ROWS = 40;
-const COLS = 80;
+const ROWS = MAP_ROWS;
+const COLS = MAP_COLS;
 
 // Pre-compute which cells are walkable (roads + node positions) — never changes
 const WALKABLE: boolean[][] = computeWalkable();
@@ -41,8 +41,8 @@ export function MapScreen({
   onHome,
 }: MapScreenProps) {
   const [playerPos, setPlayerPos] = useState<Pos>(() => {
-    const node = getNodeById(currentLocation);
-    return { row: node?.row ?? 35, col: node?.col ?? 10 };
+    const node = getNodeById(currentLocation) ?? MAP_NODES[0];
+    return { row: node?.row ?? 0, col: node?.col ?? 0 };
   });
 
   const mapCells = useMemo(
@@ -55,12 +55,19 @@ export function MapScreen({
 
   // Auto-scroll the map viewport to keep the player visible
   const mapScrollRef = useRef<HTMLDivElement>(null);
+  const mapContentRef = useRef<HTMLPreElement>(null);
+
   useLayoutEffect(() => {
     const container = mapScrollRef.current;
-    if (!container) return;
-    const lineHeight = 20; // leading-5 = 1.25rem = 20px
-    const playerTop = playerPos.row * lineHeight;
-    const playerBottom = playerTop + lineHeight;
+    const content = mapContentRef.current;
+    if (!container || !content) return;
+
+    const cellHeight = content.scrollHeight / ROWS;
+    const cellWidth = content.scrollWidth / COLS;
+    const playerTop = content.offsetTop + playerPos.row * cellHeight;
+    const playerBottom = playerTop + cellHeight;
+    const playerLeft = content.offsetLeft + playerPos.col * cellWidth;
+    const playerRight = playerLeft + cellWidth;
 
     if (playerBottom > container.scrollTop + container.clientHeight) {
       container.scrollTop = playerBottom - container.clientHeight;
@@ -68,7 +75,13 @@ export function MapScreen({
     if (playerTop < container.scrollTop) {
       container.scrollTop = playerTop;
     }
-  }, [playerPos.row]);
+    if (playerRight > container.scrollLeft + container.clientWidth) {
+      container.scrollLeft = playerRight - container.clientWidth;
+    }
+    if (playerLeft < container.scrollLeft) {
+      container.scrollLeft = playerLeft;
+    }
+  }, [playerPos]);
 
   useKeyCapture((key) => {
     let dr = 0, dc = 0;
@@ -93,35 +106,46 @@ export function MapScreen({
     const nc = playerPos.col + dc;
     if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && WALKABLE[nr][nc]) {
       setPlayerPos({ row: nr, col: nc });
+      const nextNode = getNodeAtPos(nr, nc);
+      if (nextNode) {
+        onMove(nextNode.id);
+      }
     }
   });
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 font-mono text-sm">
-      <div className="px-2 py-1">
-        <div className="flex justify-between text-xs mb-1">
-          <span className="text-green-400">{playerName}'s Kingdom</span>
-          <span className="text-amber-400">{totalGems} gems</span>
+    <div className="flex-1 flex flex-col min-h-0 font-mono text-sm px-4 py-3">
+      <div className="flex justify-center mb-2">
+        <div>
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-green-400">{playerName}'s Kingdom</span>
+            <span className="text-amber-400">{totalGems} gems</span>
+          </div>
+          <ScrollBanner lines={bannerLines} />
         </div>
-        <ScrollBanner lines={bannerLines} />
       </div>
-      <div ref={mapScrollRef} className="flex-1 min-h-0 overflow-y-auto buffer-viewport px-2 py-1">
-        <pre className="terminal-text leading-5">
-          {mapCells.map((row, r) => (
-            <div key={r}>{renderRow(row)}</div>
-          ))}
-        </pre>
-      </div>
-      <div className="px-2 py-1 border-t border-gray-700 text-xs">
-        <div className="flex justify-between">
-          <span className="text-amber-400">
-            {nodeHere ? nodeHere.label : 'On the road...'}
-          </span>
-          <span className="text-gray-500">
-            {nodeHere
-              ? '[hjkl] Move  [Enter] Enter location  [Esc] Home'
-              : '[hjkl] Move  [Esc] Home'}
-          </span>
+
+      <div ref={mapScrollRef} className="flex-1 min-h-0 overflow-auto themed-scrollbar">
+        <div className="flex w-max min-w-full justify-center pb-2">
+          <div className="border border-gray-700 bg-black/40 flex flex-col">
+            <pre ref={mapContentRef} className="terminal-text leading-5 py-1 m-0 inline-block">
+              {mapCells.map((row, r) => (
+                <div key={r}>{renderRow(row)}</div>
+              ))}
+            </pre>
+            <div className="px-2 py-1 border-t border-gray-700 text-xs">
+              <div className="flex justify-between gap-4">
+                <span className="text-amber-400">
+                  {nodeHere ? nodeHere.label : 'On the road...'}
+                </span>
+                <span className="text-gray-500 whitespace-nowrap">
+                  {nodeHere
+                    ? '[hjkl] Move  [Enter] Enter location  [Esc] Home'
+                    : '[hjkl] Move  [Esc] Home'}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -270,14 +294,18 @@ function terrainHash(r: number, c: number): number {
 }
 
 function isForestZone(r: number, c: number): boolean {
-  if (r >= 6 && r <= 34 && c >= 0 && c <= 7) return true;
-  if (r >= 32 && r <= 39 && c >= 0 && c <= 20) return true;
-  if (r >= 15 && r <= 25 && c >= 8 && c <= 15) return true;
-  if (r >= 3 && r <= 14 && c >= 26 && c <= 40) return true;
-  if (r >= 6 && r <= 16 && c >= 44 && c <= 48) return true;
-  if (r >= 14 && r <= 38 && c >= 68 && c <= 79) return true;
-  if (r >= 28 && r <= 36 && c >= 22 && c <= 32) return true;
+  if (r >= 6 && r <= 29 && c >= 0 && c <= 7) return true;
+  if (r >= 22 && r <= 31 && c >= 0 && c <= 20) return true;
+  if (r >= 12 && r <= 22 && c >= 8 && c <= 17) return true;
+  if (r >= 3 && r <= 14 && c >= 24 && c <= 42) return true;
+  if (r >= 4 && r <= 14 && c >= 48 && c <= 60) return true;
+  if (r >= 18 && r <= 30 && c >= 44 && c <= 58) return true;
+  if (r >= 10 && r <= 24 && c >= 92 && c <= 103) return true;
   return false;
+}
+
+function isRiverColumn(c: number): boolean {
+  return c >= 62 && c <= 63;
 }
 
 function getTerrainCell(r: number, c: number): MapCell {
@@ -289,18 +317,18 @@ function getTerrainCell(r: number, c: number): MapCell {
   if (r === 3 && h < 50) {
     return { char: '^n^'[h % 3], color: 'text-gray-600' };
   }
-  if (c > 77) {
+  if (c > 99) {
     return { char: '^An'[h % 3], color: 'text-gray-600' };
   }
-  if (c >= 42 && c <= 43 && r >= 3) {
+  if (isRiverColumn(c) && r >= 3) {
     return { char: '~', color: 'text-blue-500' };
   }
-  if (r >= 38 && h < 30) {
+  if (r >= ROWS - 2 && h < 30) {
     return { char: '~', color: 'text-blue-800' };
   }
-  if (r >= 3 && r <= 13 && c >= 55 && c <= 65) {
+  if (r >= 3 && r <= 13 && c >= 82 && c <= 94) {
     if (r === 3 || r === 13) return { char: '#', color: 'text-gray-500' };
-    if (c === 55 || c === 65) return { char: '#', color: 'text-gray-500' };
+    if (c === 82 || c === 94) return { char: '#', color: 'text-gray-500' };
     if (h < 10) return { char: '.', color: 'text-gray-700' };
     return { char: ' ', color: 'text-gray-800' };
   }
@@ -369,7 +397,7 @@ function drawRoad(grid: MapCell[][], r1: number, c1: number, r2: number, c2: num
     r += dr;
     if (r === r2 && c === c2) break;
     if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
-      const isWater = c >= 42 && c <= 43;
+      const isWater = isRiverColumn(c);
       grid[r][c] = {
         char: isWater ? '=' : ':',
         color: isWater ? 'text-amber-500' : 'text-amber-800',
@@ -381,7 +409,7 @@ function drawRoad(grid: MapCell[][], r1: number, c1: number, r2: number, c2: num
     c += dc;
     if (r === r2 && c === c2) break;
     if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
-      const isWater = c >= 42 && c <= 43;
+      const isWater = isRiverColumn(c);
       grid[r][c] = {
         char: isWater ? '=' : '-',
         color: isWater ? 'text-amber-500' : 'text-amber-800',
