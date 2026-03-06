@@ -46,7 +46,7 @@ xxxxxx  (delete some x's if you like)`,
     },
     gems: {
       gem1: usedKey('x', 5),
-      gem2: usedKey('r', 3),
+      gem2: usedComposed('r', 3),
       gem3: totalKeystrokesUnder(30),
     },
     award: { text: 'The camp kettle whistles happily. The sign looks proud again.' },

@@ -1,5 +1,39 @@
-import type { LessonDef } from './types.ts';
-import { usedKey, totalKeystrokesUnder, visitedPositions } from '../gemEvaluator.ts';
+import type { GemCheck, LessonDef } from './types.ts';
+import { totalKeystrokesUnder, visitedPositions } from '../gemEvaluator.ts';
+
+const MILESTONE_REQUIRED_MOVES: Array<readonly [string, string]> = [
+  ['5', 'j'],
+  ['7', 'k'],
+  ['9', 'l'],
+  ['3', 'w'],
+  ['2', 'b'],
+];
+
+const MILESTONE_ALTAR_LINE = 19;
+const MILESTONE_ALTAR_COLS = [5, 6, 7, 8, 9, 10, 11];
+
+const usedKeySequence = (sequence: readonly string[]): GemCheck => (ctx) => {
+  if (sequence.length === 0) return true;
+
+  for (let i = 0; i <= ctx.keys.length - sequence.length; i++) {
+    let matches = true;
+    for (let j = 0; j < sequence.length; j++) {
+      if (ctx.keys[i + j] !== sequence[j]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return true;
+  }
+
+  return false;
+};
+
+const usedAllMilestoneMoves: GemCheck = (ctx) =>
+  MILESTONE_REQUIRED_MOVES.every((sequence) => usedKeySequence(sequence)(ctx));
+
+const visitedMilestoneAltar: GemCheck = (ctx) =>
+  MILESTONE_ALTAR_COLS.some((col) => ctx.cursorVisited.has(`${MILESTONE_ALTAR_LINE}:${col}`));
 
 export const chapter2Lessons: LessonDef[] = [
   {
@@ -132,13 +166,8 @@ Path of Carved Numbers:
       arrowsAllowed: false,
     },
     gems: {
-      gem1: (ctx) => ctx.totalKeystrokes > 0,
-      gem2: (ctx) => {
-        for (let d = 1; d <= 9; d++) {
-          if ((ctx.keyCounts[String(d)] ?? 0) >= 1) return true;
-        }
-        return false;
-      },
+      gem1: usedAllMilestoneMoves,
+      gem2: visitedMilestoneAltar,
       gem3: totalKeystrokesUnder(15),
     },
     award: { text: 'A gem chimes in the bowl. Numbers, it turns out, can be cozy.' },

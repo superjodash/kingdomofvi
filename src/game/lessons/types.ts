@@ -1,6 +1,7 @@
 export interface GemContext {
   finalLines: string[];
   targetLines: string[] | null;
+  keys: string[];
   keyCounts: Record<string, number>;
   composedCounts: Record<string, number>;
   totalKeystrokes: number;

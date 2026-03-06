@@ -45,19 +45,21 @@ export function createEditor(config: EditorConfig): EditorInstance {
 export function editorProcessKey(editor: EditorInstance, key: string): KeyResult {
   const { composerState, config } = editor;
   const mode = composerState.editorState.mode;
+  const bypassRestrictions =
+    mode === 'insert' ||
+    mode === 'command' ||
+    composerState.searchBuffer !== null ||
+    composerState.waitingForChar !== null;
 
-  // In insert mode, always allow typing (only restrict in normal mode)
-  if (mode !== 'insert' && mode !== 'command') {
-    if (!isKeyAllowed(key, config.allowedKeys)) {
-      return {
-        editor,
-        state: {
-          ...composerState.editorState,
-          message: 'Key not yet unlocked',
-        },
-        blocked: true,
-      };
-    }
+  if (!bypassRestrictions && !isKeyAllowed(key, config.allowedKeys)) {
+    return {
+      editor,
+      state: {
+        ...composerState.editorState,
+        message: 'Key not yet unlocked',
+      },
+      blocked: true,
+    };
   }
 
   const result: ProcessResult = composerProcessKey(composerState, key);

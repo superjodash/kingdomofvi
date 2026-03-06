@@ -70,6 +70,7 @@ export function buildGemContext(
   return {
     finalLines,
     targetLines,
+    keys: state.keys,
     keyCounts: state.keyCounts,
     composedCounts: state.composedCounts,
     totalKeystrokes: state.keys.length,
